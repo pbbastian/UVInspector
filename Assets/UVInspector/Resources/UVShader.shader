@@ -45,7 +45,7 @@
 				v2f o;
 				o.vertex = float4(TRANSFORM_TEX(v.uv, _MainTex) * 2 - 1, 0, 1);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                o.objectPosition = (v.vertex - _Center) / _Extents;
+                o.objectPosition = ((v.vertex - _Center) / _Extents) * 0.5 + 0.5;
 				UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
 			}
