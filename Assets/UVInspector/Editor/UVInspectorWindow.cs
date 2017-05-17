@@ -84,11 +84,26 @@ public class UVInspectorWindow : EditorWindow
             return;
         }
 
-        var saveTexture = GUILayout.Button("Save texture");
+        var objectPosition = m_SelectedObject.transform.position;
+        var objectRotation = m_SelectedObject.transform.rotation;
+        var objectScale = m_SelectedObject.transform.localScale;
+
+        m_SelectedObject.transform.position = Vector3.zero;
+        m_SelectedObject.transform.rotation = Quaternion.identity;
+        m_SelectedObject.transform.localScale = Vector3.one;
 
         var bounds = m_SelectedObject.CalculateBounds();
+
+        m_SelectedObject.transform.position = objectPosition;
+        m_SelectedObject.transform.rotation = objectRotation;
+        m_SelectedObject.transform.localScale = objectScale;
+
 		m_UvMaterial.SetVector("_Center", bounds.center);
 		m_UvMaterial.SetVector("_Extents", bounds.extents);
+
+        EditorGUILayout.LabelField("Center", bounds.center.ToString());
+        EditorGUILayout.LabelField("Extents", bounds.extents.ToString());
+		var saveTexture = GUILayout.Button("Save texture");
 
         var renderRect = new Rect(Vector2.zero, new Vector2(m_TextureWidth, m_TextureHeight));
         m_PreviewRenderUtility.BeginPreview(renderRect, GUIStyle.none);
