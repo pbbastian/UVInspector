@@ -36,8 +36,8 @@ public class UVInspectorWindow : EditorWindow
         }
     }
 
-	readonly string k_TextureWidthKey = typeof(UVInspectorWindow).FullName + "/" + nameof(m_TextureWidth);
-    readonly string k_TextureHeightKey = typeof(UVInspectorWindow).FullName + "/" + nameof(m_TextureHeight);
+	readonly string k_TextureWidthKey = typeof(UVInspectorWindow).FullName + "/TextureWidth";
+    readonly string k_TextureHeightKey = typeof(UVInspectorWindow).FullName + "/TextureHeight";
 
     void OnEnable()
     {
@@ -77,7 +77,7 @@ public class UVInspectorWindow : EditorWindow
         }
 
         var renderer = m_SelectedObject.GetComponent<Renderer>();
-        var mesh = renderer != null ? m_SelectedObject.GetComponent<MeshFilter>()?.sharedMesh : null;
+        var mesh = renderer != null ? m_SelectedObject.GetComponent<MeshFilter>().sharedMesh : null;
         if (mesh == null)
         {
             GUILayout.Label("Selected object has no mesh.");
@@ -105,7 +105,10 @@ public class UVInspectorWindow : EditorWindow
         EditorGUILayout.LabelField("Extents", bounds.extents.ToString());
 		var saveTexture = GUILayout.Button("Save texture");
 
-        var renderRect = new Rect(Vector2.zero, new Vector2(m_TextureWidth, m_TextureHeight));
+        var renderRect = new Rect(Vector2.zero,
+                                  new Vector2(
+                                      Mathf.Min(m_TextureWidth, 2048) / (2f * EditorGUIUtility.pixelsPerPoint),
+									  Mathf.Min(m_TextureHeight, 2048) / (2f * EditorGUIUtility.pixelsPerPoint)));
         m_PreviewRenderUtility.BeginPreview(renderRect, GUIStyle.none);
         m_PreviewRenderUtility.DrawMesh(mesh, Matrix4x4.identity, m_UvMaterial, 0);
 		m_PreviewRenderUtility.camera.transform.position = Vector3.forward * -10f;
@@ -124,7 +127,7 @@ public class UVInspectorWindow : EditorWindow
             RenderTexture.active = renderTexture;
             var texture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.ARGB32, false);
             texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
-            texture.Apply();
+			texture.Apply();
             var pngData = texture.EncodeToPNG();
             if (pngData != null)
                 File.WriteAllBytes(path, pngData);
